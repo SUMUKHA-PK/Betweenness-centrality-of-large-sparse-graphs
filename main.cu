@@ -3,6 +3,10 @@
 
 #include<cuda.h>
 #include<stdio.h>
+#include<iostream>
+#include<vector>
+#include<string>
+using namespace std;
 
 int main()
 {
@@ -27,7 +31,7 @@ int main()
                 count=0;
             }
         }
-        else if(c>='0'&&c<='9') count++;
+        else if(c==' ') ++count;
         c = fgetc(fp); 
     } 
     fclose(fp);
@@ -37,37 +41,38 @@ int main()
     long long int *n2 = (long long int *)malloc(b*sizeof(long long int));
     long long int *n3 = (long long int *)malloc(a*sizeof(long long int));
     count=0;
+    string x = "";
     while (c != EOF) 
     { 
-        if(c>='0'&&c<='9')
+        if(c!=' ')
+        {
+            x+=c;
+        } 
+        else if(c==' '||c=='\n')
         {
             if(count<a)
             {
-                n1[count]=c-'0';
+                n1[count]=stoi(x);
+                x="";
                 count++;
             }   
             else if(count>=a&&count<(a+b))
             {
-                n2[count-(a)]=c-'0';
+                n2[count-(a)]=stoi(x);
+                x="";
                 count++;
             }
             else
             {
-                n3[count-(a+b)]=c-'0';
+                n3[count-(a+b)]=stoi(x);
+                x="";
                 count++;
             }
-       } 
+        }
        c = fgetc(fp); 
     } 
-    for(int i=0;i<a;i++)
-        printf("%lld ",n1[i]);
-    printf("\n");
-    for(int i=0;i<b;i++)
-        printf("%lld ",n2[i]);
-    printf("\n");
-    for(int i=0;i<a;i++)
-        printf("%lld ",n3[i]);
-    
+    n3[a-1]=stoi(x);
+
     fclose(fp);
     return 0;
 }

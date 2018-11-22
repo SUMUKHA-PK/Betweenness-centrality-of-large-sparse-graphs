@@ -107,5 +107,9 @@ int main()
             printf("%lld ",*(graph+i*dim2+j));
         printf("\n");
     }
+
+//---------------------------------------------Graph is generated--------------------------
+
+    
     return 0;
 }

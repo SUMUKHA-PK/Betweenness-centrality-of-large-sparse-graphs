@@ -6,7 +6,10 @@
 #include<iostream>
 #include<vector>
 #include<string>
+#include"graphs.h"
+
 using namespace std;
+using namespace graph;
 
 int main(int argc,char ** argv)
 {
@@ -85,40 +88,38 @@ int main(int argc,char ** argv)
 //-------------------------------------------File input done------------------------------
 
     long long int dim2=n4[0],dim1=n4[1];
-    long long int *graph = (long long int *)malloc(dim1*dim2*sizeof(long long int));
-    for(i=0;i<dim1;i++)
-    {
-        for(j=0;j<dim2;j++)
-            *(graph+i*dim2+j)=0;
-    }
-   
-    int cc=0;
+    Edge * edges = new Edge[a];   //Number of edges is size of n1
+
+    long long cc =0,cd=0,ignore=0;
     for(i=1;i<=dim1;i++)
     {
-        long long int x = n2[i]-n2[i-1];
+        long long x = n2[i]-n2[i-1];
         for(j=cc;j<cc+x;j++)
         {
-            *(graph+(i-1)*dim2+n3[j])=n1[j];
+            if((i-1)!=n3[j])
+            {
+                edges[cd].from=(i-1);
+                edges[cd].to=n3[j];
+                cd++;
+            }
+            else
+            {   
+                ignore++;
+            }
         }
         cc+=x;
     }
-    for(i=0;i<dim1;i++)
-    {
-        for(j=0;j<dim2;j++)
-            if(i==j) *(graph+i*dim2+j)=0;
-    }
-    for(i=0;i<dim1;i++)
-    {
-        for(j=0;j<dim2;j++)
-            printf("%lld ",*(graph+i*dim2+j));
-        printf("\n");
-    }
+    a-=ignore;
+    // for(i=0;i<a;i++)
+    // {
+    //     cout<<edges[i].from<<" "<<edges[i].to<<endl;
+    // }
+    
     free(n1);
     free(n2);
     free(n3);
     free(n4);
 //---------------------------------------------Graph is generated--------------------------
 
-    
     return 0;
 }

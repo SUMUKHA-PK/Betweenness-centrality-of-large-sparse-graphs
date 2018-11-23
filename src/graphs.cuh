@@ -9,7 +9,7 @@ namespace graph{
 
     typedef struct vertex {
         long long id;
-        vertex * next;
+        vertex * parents;
         int visited;
     } Vertex;
     

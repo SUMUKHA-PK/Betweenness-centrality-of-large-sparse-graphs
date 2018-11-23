@@ -1,2 +1,2 @@
-#include "graphs.h"
+#include "graphs.cuh"
 

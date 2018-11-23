@@ -9,7 +9,7 @@ namespace graph
 
         if(vid < no_nodes)
         {
-            if(vx[id].inQ == true && vx[id].visited == false)
+            if(vs[id].inQ == true && vs[id].visited == false)
             {
                 
                 vs[id].visited = true;

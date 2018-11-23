@@ -15,10 +15,10 @@ namespace graph
 
     typedef struct vertex 
     {
-        long long id;
         Item * item;
         bool visited;
         bool inQ;
+        long long distance;
     } Vertex;
     
     typedef struct edge

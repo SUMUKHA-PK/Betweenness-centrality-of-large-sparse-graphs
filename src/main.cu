@@ -8,10 +8,10 @@
 #include<string>
 using namespace std;
 
-int main()
+int main(int argc,char ** argv)
 {
     FILE *fp;
-    fp = fopen("file.txt", "r");
+    fp = fopen(argv[argc-1], "r");
     char c = fgetc(fp); 
     int flag = -1;
     long long int i,j,a=0,nnz=2,b=0,count=0;
@@ -36,7 +36,7 @@ int main()
         c = fgetc(fp); 
     } 
     fclose(fp);
-    fp = fopen("file.txt", "r");
+    fp = fopen(argv[argc-1], "r");
     c = fgetc(fp);
     long long int *n1 = (long long int *)malloc(a*sizeof(long long int));
     long long int *n2 = (long long int *)malloc(b*sizeof(long long int));
@@ -110,6 +110,9 @@ int main()
 
 //---------------------------------------------Graph is generated--------------------------
 
-    
+    free(n1);
+    free(n2);
+    free(n3);
+    free(n4);
     return 0;
 }

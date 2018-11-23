@@ -5,24 +5,42 @@
 
 using namespace std;
 
-namespace graph{
-
-    typedef struct vertex {
+namespace graph
+{   
+    typedef struct item
+    {
         long long id;
-        vertex * parents;
-        int visited;
+        struct item * item;
+    } Item;
+
+    typedef struct vertex 
+    {
+        long long id;
+        Item * item;
+        bool visited;
+        bool inQ;
     } Vertex;
     
-    typedef struct edge {
-        long long from;
-        long long to;
+    typedef struct edge
+    {
+        Item * item;
     } Edge;
     
-    __global__
-    void initDFS(Vertex * vs, int sid);
+    class graph
+    {
 
-    __global__
-    void dfs(int done, Vertex * vs, Edge * es);
+    public:
+
+        __global__
+        void initBFS(Vertex * vs, int sid);
+
+        __global__
+        void bfs(int done, Vertex * vs, Edge * es);
+
+        Vertex * vs;
+        Edge * es;
+
+    };
 }
 
 #endif

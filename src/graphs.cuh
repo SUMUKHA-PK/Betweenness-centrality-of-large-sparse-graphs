@@ -13,7 +13,7 @@ namespace graph
         struct item * item;
     } Item;
 
-    typedef struct vertex 
+    typedef struct vertex
     {
         Item * item;
         bool visited;

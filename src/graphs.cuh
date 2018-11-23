@@ -1,3 +1,6 @@
+#ifndef GRAPHS
+#define GRAPHS
+
 #include <iostream>
 
 using namespace std;
@@ -21,3 +24,5 @@ namespace graph{
     __global__
     void dfs(int done, Vertex * vs, Edge * es);
 }
+
+#endif

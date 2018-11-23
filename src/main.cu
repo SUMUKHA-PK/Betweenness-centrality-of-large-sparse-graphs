@@ -91,6 +91,7 @@ int main(int argc,char ** argv)
         for(j=0;j<dim2;j++)
             *(graph+i*dim2+j)=0;
     }
+   
     int cc=0;
     for(i=1;i<=dim1;i++)
     {
@@ -104,15 +105,20 @@ int main(int argc,char ** argv)
     for(i=0;i<dim1;i++)
     {
         for(j=0;j<dim2;j++)
+            if(i==j) *(graph+i*dim2+j)=0;
+    }
+    for(i=0;i<dim1;i++)
+    {
+        for(j=0;j<dim2;j++)
             printf("%lld ",*(graph+i*dim2+j));
         printf("\n");
     }
-
-//---------------------------------------------Graph is generated--------------------------
-
     free(n1);
     free(n2);
     free(n3);
     free(n4);
+//---------------------------------------------Graph is generated--------------------------
+
+    
     return 0;
 }

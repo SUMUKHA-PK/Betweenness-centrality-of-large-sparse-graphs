@@ -11,7 +11,7 @@ namespace graph{
         int visited;
     } Vertex;
     
-    typedef struct vertex {
+    typedef struct edge {
         long long from;
         long long to;
     } Edge;

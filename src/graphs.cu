@@ -14,8 +14,8 @@ namespace graph
 
             if(vs[id].visited == false && vx[id].inQ == true)
             {
-                while(es[id]->v != NULL){
-                                  
+                while(es[id]-> != NULL){
+                    
                 }
             }
 

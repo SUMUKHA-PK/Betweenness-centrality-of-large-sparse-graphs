@@ -6,49 +6,24 @@
 using namespace std;
 
 namespace graph
-{
-    typedef struct Lock
+{   
+    typedef struct item
     {
-        int * mutex;
-    
-        Lock()
-        {
-            int state=0;
-            cudaMalloc((void∗∗)&mutex, sizeof(int)));
-            cudaMemcpy(mutex, &state, sizeof(int), cudaMemcpyHostToDevice));
-        };
-    
-        ~Lock()
-        {
-            cudaFree(mutex);
-        };
-    
-        __device__ void
-        lock()
-        {
-            while(atomicCAS(mutex,0,1)!=0);
-        };
-    
-        __device__ void
-        unlock()
-        {
-            atomicExch(mutex,0);
-        };
-    
-    }
-    Lock;
-    
+        long long id;
+        struct item * item;
+    } Item;
+
     typedef struct vertex 
     {
         long long id;
-        vertex * parents;
+        Item * item;
         bool visited;
         bool inQ;
     } Vertex;
     
-    typedef struct edge 
+    typedef struct edge
     {
-        Vertex * v;
+        Item * item;
     } Edge;
     
     class graph

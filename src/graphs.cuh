@@ -5,12 +5,12 @@
 
 using namespace std;
 
-namespace graph
+namespace graphs
 {   
-    typedef struct item
+    typedef struct i
     {
         long long id;
-        struct item * item;
+        struct i * item;
     } Item;
 
     typedef struct vertex
@@ -31,8 +31,7 @@ namespace graph
 
     public:
 
-        __global__
-        void bfs(int done, Vertex * vs, Edge * es, int no_nodes);
+        void call_bfs(int ** G);
 
         Vertex * vs;
         Edge * es;

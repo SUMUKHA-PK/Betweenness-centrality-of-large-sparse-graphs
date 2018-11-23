@@ -98,7 +98,7 @@ void call_bfs(int ** G)
     while(true){
         h_done = true;
         cudaMemcpy(d_done, &h_done, sizeof(bool), cudaMemcpyHostToDevice);
-        bfs<<<5, 5>>>(d_done, d_vs, d_es, 5);
+        bfs<<<5, 5>>>(d_done, d_vs, d_es, 5, mutex);
         cudaMemcpy(&h_done, d_done, sizeof(bool), cudaMemcpyDeviceToHost);
         if(h_done == true)
             break;
@@ -143,19 +143,15 @@ void bfs(bool * done, Vertex * vs, Edge * es, int no_nodes, int * mutex)
                     
                     if(vs[n_id].distance == vs[id].distance + 1)
                     {
-                        lock(mutex);
                         vs[n_id].parents[vs[n_id].no_parents] = id;
                         vs[n_id].no_parents += 1;
-                        unlock(mutex);
                         vs[n_id].inQ = true;
                     }
                     else if(vs[n_id].distance > vs[id].distance + 1)
                     {
-                        lock(mutex);
                         vs[n_id].parents[0] = id;
                         vs[n_id].no_parents = 1;
                         vs[n_id].distance = vs[id].distance + 1;
-                        unlock(mutex);
                         vs[n_id].inQ = true;
                     }
                     // printf("Visited and Done %d  %d\n", vs[n_id].visited, done);

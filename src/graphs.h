@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 
 using namespace std;
 
@@ -20,5 +19,5 @@ namespace graph{
     void initDFS(Vertex * vs, int sid);
 
     __global__
-    void dfs();
+    void dfs(int done, Vertex * vs, Edge * es);
 }

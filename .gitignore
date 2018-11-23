@@ -1,3 +1,5 @@
-src/*.exe
-src/*.lib
-src/*.exp
+*.exe
+*.lib
+*.exp
+*.csr
+*.txt

@@ -1,37 +1,25 @@
 import numpy as np
 import random
 
-d=[370,370]
-n = 1200 #Preset number of edges in graph
-a=np.zeros(shape=(n),dtype=int)
-c=np.zeros(shape=(n),dtype=int)
-b=np.zeros(shape=(d[0]+1),dtype=int)
+d=[1000000,1000000]
+n = 100000 #Preset number of edges in graph
+a=np.zeros(shape=(n),dtype=object)
+c=np.zeros(shape=(n),dtype=object)
+b=np.zeros(shape=(d[0]+1),dtype=object)
 
 for i in range(len(a)):
-    a[i]=i
+    a[i]=1
 
 for i in range(len(c)):
-    c[i]=i
+    c[i]=random.randint(0,1000)%d[0]
 
-b[0]=0
-x=n
-i=len(b)-1
-while(i>4):
-    b[i]=x
-    x-=1
-    i-=1
-    b[i]=x
-    x-=2
-    i-=1
-    b[i]=x
-    x-=3
-    i-=1
-    b[i]=x
-    x-=4
-    i-=1
-    b[i]=x
-    x-=5
-    i-=1
+x=0
+y=n//d[0]
+
+for i in range(1,len(b)):
+    b[i]=b[i-1]+y
+
+b[len(b)-1]=b[len(b)-2]+n-(n//d[0])*(d[0]-1)    
 
 with open('demo1.txt', 'w') as f:
     for item in a:

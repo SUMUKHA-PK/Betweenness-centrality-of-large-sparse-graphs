@@ -32,10 +32,7 @@ namespace graph
     public:
 
         __global__
-        void initBFS(Vertex * vs, int sid);
-
-        __global__
-        void bfs(int done, Vertex * vs, Edge * es);
+        void bfs(int done, Vertex * vs, Edge * es, int no_nodes);
 
         Vertex * vs;
         Edge * es;

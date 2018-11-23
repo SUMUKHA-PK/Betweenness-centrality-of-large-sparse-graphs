@@ -109,7 +109,9 @@ int main(int argc,char ** argv)
                 Item * temp = edges[i-1].item;
                 while(temp->item!=NULL)
                     temp=temp->item;
-                
+                Item *t = new Item;
+                temp->item=t;
+                t->item=NULL;
             }
             else
             {   

@@ -10,7 +10,12 @@ namespace graph{
         vertex * next;
         int visited;
     } Vertex;
-
+    
+    typedef struct edge {
+        long long from;
+        long long to;
+    } Edge;
+    
     __global__
     void initDFS(Vertex * vs, int sid);
 

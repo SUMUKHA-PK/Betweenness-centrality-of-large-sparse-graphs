@@ -6,7 +6,7 @@
 #include<iostream>
 #include<vector>
 #include<string>
-#include"graphs.h"
+#include"graphs.cuh"
 
 using namespace std;
 using namespace graph;
@@ -88,19 +88,28 @@ int main(int argc,char ** argv)
 //-------------------------------------------File input done------------------------------
 
     long long int dim2=n4[0],dim1=n4[1];
-    Edge * edges = new Edge[a];   //Number of edges is size of n1
+    Edge * edges = new Edge[dim1];   //Number of edges is size of n1
+    Vertex * vertices = new Vertex[dim2];
 
+    for(i=0;i<dim1;i++)
+        edges[i]->item=NULL;
+    
     long long cc =0,cd=0,ignore=0;
     for(i=1;i<=dim1;i++)
     {
+        vertices[i-1].id=i-1;
         long long x = n2[i]-n2[i-1];
         for(j=cc;j<cc+x;j++)
         {
             if((i-1)!=n3[j])
             {
-                edges[cd].from=(i-1);
+                edges[i-1].from=(i-1);
                 edges[cd].to=n3[j];
                 cd++;
+                Item * temp = edges[i-1].item;
+                while(temp->item!=NULL)
+                    temp=temp->item;
+                
             }
             else
             {   
@@ -115,11 +124,17 @@ int main(int argc,char ** argv)
     //     cout<<edges[i].from<<" "<<edges[i].to<<endl;
     // }
     
+    for(i=a;i<2*a;i++)
+    {
+        edges[i].from=edges[i-a].to;
+        edges[i].to=edges[i-a].from;
+    }
     free(n1);
     free(n2);
     free(n3);
     free(n4);
 //---------------------------------------------Graph is generated--------------------------
 
+    
     return 0;
 }

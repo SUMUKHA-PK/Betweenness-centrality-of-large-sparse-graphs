@@ -111,14 +111,7 @@ int main(int argc,char ** argv)
     }
     a-=ignore;
 
-    for(int i = 0; i < dim1; i++){
-        cout << edges[i].no_neigh << endl;
-
-        for(int j=0; j<edges[i].no_neigh; j++)
-            cout << edges[i].neighbours[j] << "\t";
-
-        cout << endl << endl;
-    }
+    calculateBC(edges, dim1);    
 
     free(n1);
     free(n2);

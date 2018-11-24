@@ -12,7 +12,7 @@ namespace graphs{
         int no_neigh;
     } Edge;
     
-    void calculateBC(Edge * edges, int no_edges);
+    void calculateBC(Edge * edges, int no_nodes);
 }
 
 #endif

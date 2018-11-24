@@ -61,13 +61,6 @@ void stage2_2(int * d_delta, int *  d_dist, int *  d_sigma, int * d_S, Edge * d_
         int w = d_S[tid];
         float dsw = 0;
         int sw = d_sigma[w];
-            
-        printf("SIGMA \n");
-
-        for(int i=0; i < 5; i++)
-            printf("%d ", d_sigma[i]);
-
-        printf("\n");
 
         for(int i = 0; i < d_edges[w].no_neigh; i++){
             int v = d_edges[w].neighbours[i];
@@ -150,14 +143,16 @@ namespace graphs{
         cudaMemcpy(d_edges, h_edges, no_nodes*sizeof(Edge), cudaMemcpyHostToDevice);
 
         while(1){
-            stage1<<<10,10>>>(d_status,d_q_curlen,d_q_nexlen,d_S_len,d_ends_len,d_q_cur,d_q_next,d_sigma,d_delta,d_S,d_ends,d_dist,d_depth,d_no_nodes,d_edges);
+            int blocks = ceil((float)no_nodes/size);
+
+            stage1<<<blocks,size>>>(d_status,d_q_curlen,d_q_nexlen,d_S_len,d_ends_len,d_q_cur,d_q_next,d_sigma,d_delta,d_S,d_ends,d_dist,d_depth,d_no_nodes,d_edges);
             cudaMemcpy(&h_q_nexlen, d_q_nexlen, sizeof(int), cudaMemcpyDeviceToHost);
  
             if(h_q_nexlen==0){
                 single<<<1, 1>>>(d_depth, d_dist, d_S, d_S_len);
                 break;
             }
-            stage1_1<<<10,10>>>(d_status,d_q_curlen,d_q_nexlen,d_S_len,d_ends_len,d_q_cur,d_q_next,d_sigma,d_delta,d_S,d_ends,d_dist,d_depth,d_no_nodes,d_edges);
+            stage1_1<<<blocks,size>>>(d_status,d_q_curlen,d_q_nexlen,d_S_len,d_ends_len,d_q_cur,d_q_next,d_sigma,d_delta,d_S,d_ends,d_dist,d_depth,d_no_nodes,d_edges);
             singleThread<<<1, 1>>>(d_ends, d_ends_len, d_q_nexlen, d_q_curlen, d_S_len);
         }
         
@@ -173,9 +168,11 @@ namespace graphs{
             offset = h_ends[counter];
             int itr = h_ends[counter + 1] - 1 - offset;
 
-            // int blocks = ceil((float)itr/size);
+            int blocks = ceil((float)(itr+1)/size);
 
-            stage2_2<<<1, size>>>(d_delta, d_dist, d_sigma, d_S, d_edges, (const int)offset, (const int)itr);
+            cout << blocks << endl;
+
+            stage2_2<<<blocks, size>>>(d_delta, d_dist, d_sigma, d_S, d_edges, (const int)offset, (const int)itr);
 
             counter --;
         }

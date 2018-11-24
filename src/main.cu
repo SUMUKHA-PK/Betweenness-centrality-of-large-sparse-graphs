@@ -159,6 +159,15 @@ int main(int argc,char ** argv)
     free(n2);
     free(n3);
     free(n4);
+
+    for(i=0;i<dim1;i++)
+    {
+        for(j=0;j<edges[i].no_neigh;j++)
+        {
+            cout<<edges[i].neighbours[j]<<" ";
+        }
+        cout<<endl;
+    }
 //---------------------------------------------Graph is generated--------------------------
 
     

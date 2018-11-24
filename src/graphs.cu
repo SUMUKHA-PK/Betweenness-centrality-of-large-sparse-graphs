@@ -74,6 +74,12 @@ namespace graphs{
         int * d_q_curlen, * d_q_nexlen, * d_depth, * d_S_len, * d_ends_len;
 
         int * d_q_cur, * d_q_next, * d_sigma, * d_delta, * d_S, * d_ends, * d_dist, h_depth;
+
+        int * h_dis = new int[no_nodes];
+
+        h_dis = { INT_MAX };
+
+        h_dis[0] = 0;
         
         Edge * d_edges;
 
@@ -109,7 +115,7 @@ namespace graphs{
         cudaMemcpy(d_sigma, &One, sizeof(int), cudaMemcpyHostToDevice);
         cudaMemcpy(d_S, &Zero, sizeof(int), cudaMemcpyHostToDevice);
         cudaMemcpy(d_ends, &Zero, sizeof(int), cudaMemcpyHostToDevice);
-        cudaMemcpy(d_dist, &Zero, sizeof(int), cudaMemcpyHostToDevice);
+        cudaMemcpy(d_dist, h_dis, no_nodes*sizeof(int), cudaMemcpyHostToDevice);
            
         cudaMemcpy(d_edges, h_edges, no_nodes*sizeof(Edge), cudaMemcpyHostToDevice);
 

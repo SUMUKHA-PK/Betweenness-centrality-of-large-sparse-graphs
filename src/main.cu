@@ -8,6 +8,7 @@
 #include<string>
 #include <ctime>
 #include"graphs.cuh"
+#include"graphs.cu"
 
 using namespace std;
 using namespace graphs;

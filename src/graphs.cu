@@ -50,11 +50,6 @@ void singleThread(int * d_ends, int * d_ends_len, int * d_q_nexlen, int * d_q_cu
     *d_q_curlen=*d_q_nexlen;
     *d_S_len+=*d_q_nexlen;
     *d_q_nexlen=0;
-
-    for(int i=0; i < *d_ends_len; ++i)
-        printf("%d \t", d_ends[i]);
-    
-    printf("\n");
 }
 
 
@@ -75,7 +70,11 @@ void stage2(int * d_delta, int *  d_dist, int *  d_sigma, int * d_S, Edge * d_ed
             }
         }
         d_delta[w] = (int)dsw;
-        
+    
+        for(int g=0;g<5;g++)
+        {
+            printf("%d ",d_delta[g]);
+        }printf("\n");
         __syncthreads();
     }
 }
@@ -166,6 +165,7 @@ namespace graphs{
 
         int counter = h_depth;
 
+        cout<<"Counter "<<counter<<endl;
         while(counter >= 0){
             int offset = h_ends[counter];
             int itr = h_ends[counter + 1] - 1 - offset;

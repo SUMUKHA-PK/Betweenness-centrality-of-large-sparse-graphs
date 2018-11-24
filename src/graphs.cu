@@ -54,11 +54,11 @@ void singleThread(int * d_ends, int * d_ends_len, int * d_q_nexlen, int * d_q_cu
 
 
 __global__
-void stage2(int * d_delta, int *  d_dist, int *  d_sigma, int * d_S, Edge * d_edges, int offset,int itr){        
+void stage2(int * d_delta, int *  d_dist, int *  d_sigma, int * d_S, Edge * d_edges, int * offset, int itr){        
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
-
-    if(idx < itr){
-        int tid = idx + offset;
+    
+    if(idx <= itr){
+        int tid = idx + *offset;
         int w = d_S[tid];
         float dsw = 0;
         int sw = d_sigma[w];
@@ -81,7 +81,7 @@ namespace graphs{
 
         int * d_q_curlen, * d_q_nexlen, * d_depth, * d_S_len, * d_ends_len, * d_no_nodes, h_q_nexlen;
 
-        int * d_q_cur, * d_q_next, * d_sigma, * d_delta, * d_S, * d_ends, * d_dist, * h_ends, h_depth;
+        int * d_q_cur, * d_q_next, * d_sigma, * d_delta, *h_delta, * d_S, * d_ends, * d_dist, * h_ends, h_depth;
 
         int * h_dis = new int[no_nodes];
         h_ends = new int[no_nodes];
@@ -157,12 +157,21 @@ namespace graphs{
 
         while(counter >= 0){
             int offset = h_ends[counter];
+            int * d_offset;
+
+            cudaMalloc((void **)&d_offset, sizeof(int));
+            cudaMemcpy(d_q_curlen, &offset, sizeof(int), cudaMemcpyHostToDevice);
+
             int itr = h_ends[counter + 1] - 1 - offset;
 
             int blocks = ceil((float)itr/size);
-            stage2<<<blocks,size>>>(d_delta, d_dist, d_sigma, d_S, d_edges, offset, itr);
+            stage2<<<blocks,size>>>(d_delta, d_dist, d_sigma, d_S, d_edges, d_offset, itr);
             counter --;
         }
+
+        h_delta = new int[no_nodes];
+        
+        cudaMemcpy(h_delta, d_delta, no_nodes * sizeof(int),cudaMemcpyDeviceToHost);
 
         cudaFree(d_q_curlen);
         cudaFree(d_q_nexlen);

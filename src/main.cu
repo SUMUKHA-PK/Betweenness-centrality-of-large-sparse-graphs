@@ -6,6 +6,7 @@
 #include<iostream>
 #include<vector>
 #include<string>
+#include <ctime>
 #include"graphs.cuh"
 
 using namespace std;
@@ -111,7 +112,19 @@ int main(int argc,char ** argv)
     }
     a-=ignore;
 
+    cout << "Strarted Computing ...." << endl;
+
+    clock_t begin = clock();
+
     calculateBC(edges, dim1);    
+
+    clock_t end = clock();
+
+    cout << "Completed Computing ...." << endl;
+
+    double elapsed_secs = double(end - begin) / (CLOCKS_PER_SEC * 1000);
+
+    cout << "Elapsed Time : " << elapsed_secs << endl;
 
     free(n1);
     free(n2);

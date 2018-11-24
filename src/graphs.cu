@@ -198,7 +198,7 @@ namespace graphs{
 
         clock_t end = clock();
 
-        double elapsed_secs = double(end - begin) / (CLOCKS_PER_SEC * 1000);
+        double elapsed_secs = double(end - begin) / (CLOCKS_PER_SEC);
         
         Results res;
 

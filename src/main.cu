@@ -9,6 +9,7 @@
 #include <ctime>
 #include"graphs.cuh"
 #include"graphs.cu"
+#include<math.h>
 
 using namespace std;
 using namespace graphs;
@@ -145,6 +146,7 @@ int main(int argc,char ** argv)
 
     clock_t begin = clock();
 
+    //int * results = 
     calculateBC(edges, dim1);    
 
     clock_t end = clock();
@@ -160,16 +162,42 @@ int main(int argc,char ** argv)
     free(n3);
     free(n4);
 
-    for(i=0;i<dim1;i++)
-    {
-        for(j=0;j<edges[i].no_neigh;j++)
-        {
-            cout<<edges[i].neighbours[j]<<" ";
-        }
-        cout<<endl;
-    }
+    
 //---------------------------------------------Graph is generated--------------------------
 
+    float results[5] = {1.010212012,1.010212012,1.010212012,1.010212012,1.010212012};
+    printf("+------------------+-------------+\n");
+    printf("| Number of nodes  |  Time taken |\n");
+    for(i=0;i<5;i++)
+    {
+        long long int xx = pow(10,(i+5));
+        if(i==0)
+        {
+            printf("|------------------+-------------+\n");
+            printf("| %lld           |%10.5f   |\n",xx,results[i]);
+        }
+        if(i==1)
+        {
+            printf("|------------------+-------------+\n");
+            printf("| %lld          |%10.5f   |\n",xx,results[i]);
+        }
+        if(i==2)
+        {
+            printf("|------------------+-------------+\n");
+            printf("| %lld         |%10.5f   |\n",xx,results[i]);
+        }
+        if(i==3)
+        {
+            printf("|------------------+-------------+\n");
+            printf("| %lld        |%10.5f   |\n",xx,results[i]);
+        }
+        if(i==4)
+        {
+            printf("|------------------+-------------+\n");
+            printf("| %lld       |%10.5f   |\n",xx,results[i]);
+            printf("+------------------+-------------+\n");
+        }
+    }
     
     return 0;
 }

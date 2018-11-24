@@ -61,14 +61,7 @@ void stage2_2(int * d_delta, int *  d_dist, int *  d_sigma, int * d_S, Edge * d_
         int w = d_S[tid];
         float dsw = 0;
         int sw = d_sigma[w];
-            
-        printf("SIGMA \n");
-
-        for(int i=0; i < 5; i++)
-            printf("%d ", d_sigma[i]);
-
-        printf("\n");
-
+    
         for(int i = 0; i < d_edges[w].no_neigh; i++){
             int v = d_edges[w].neighbours[i];
             if(d_dist[v] == d_dist[w] + 1){
@@ -81,10 +74,6 @@ void stage2_2(int * d_delta, int *  d_dist, int *  d_sigma, int * d_S, Edge * d_
     }
 }
 
-// __global__
-// void stage2(int * d_delta, int *  d_dist, int *  d_sigma, int * d_S, Edge * d_edges, int offset, int itr, int blocks){        
-//     stage2_2<<<blocks, size>>>(d_delta,  d_dist,  d_sigma, d_S, d_edges, offset, itr);
-// }
 
 namespace graphs{
 
@@ -184,12 +173,6 @@ namespace graphs{
         
         cudaMemcpy(h_delta, d_delta, no_nodes * sizeof(int),cudaMemcpyDeviceToHost);
         
-        for(int i=0; i < no_nodes; i++){
-            cout << h_delta[i] << "\t"; 
-        }
-
-        cout << endl;
-
         cudaFree(d_q_curlen);
         cudaFree(d_q_nexlen);
         cudaFree(d_depth);

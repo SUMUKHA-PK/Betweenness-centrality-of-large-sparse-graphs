@@ -35,112 +35,6 @@ void stage1_1(bool * status, int * d_q_curlen, int * d_q_nexlen, int * d_S_len, 
         d_q_cur[id]=d_q_next[id];
         d_S[id+*d_S_len]=d_q_next[id];
         __syncthreads();
-
-        if(id==0)
-        {
-            for(int x = 0;x<5;x++)
-                printf("%d ",d_sigma[x]);
-            printf("sigma\n");
-            for(int x = 0;x<5;x++)
-                printf("%d ",d_ends[x]);
-            printf("ends\n");
-            for(int x = 0;x<5;x++)
-                printf("%d ",d_S[x]);
-            printf("S\n");
-            for(int x = 0;x<5;x++)
-                printf("%d ",d_dist[x]);
-            printf("dist\n");
-            for(int x=0;x<*d_q_curlen;x++)
-                printf("%d ",d_q_cur[x]);
-            printf("cur\n");
-            for(int x=0;x<*d_q_nexlen;x++)
-                printf("%d ",d_q_next[x]);
-            printf("nex\n");
-        }
-        if(id==1)
-        {
-            for(int x = 0;x<5;x++)
-                printf("%d ",d_sigma[x]);
-            printf("sigma\n");
-            for(int x = 0;x<5;x++)
-                printf("%d ",d_ends[x]);
-            printf("ends\n");
-            for(int x = 0;x<5;x++)
-                printf("%d ",d_S[x]);
-            printf("S\n");
-            for(int x = 0;x<5;x++)
-                printf("%d ",d_dist[x]);
-            printf("dist\n");
-            for(int x=0;x<*d_q_curlen;x++)
-                printf("%d ",d_q_cur[x]);
-            printf("cur\n");
-            for(int x=0;x<*d_q_nexlen;x++)
-                printf("%d ",d_q_next[x]);
-            printf("nex\n");
-        }
-        if(id==2)
-        {
-            for(int x = 0;x<5;x++)
-                printf("%d ",d_sigma[x]);
-            printf("sigma\n");
-            for(int x = 0;x<5;x++)
-                printf("%d ",d_ends[x]);
-            printf("ends\n");
-            for(int x = 0;x<5;x++)
-                printf("%d ",d_S[x]);
-            printf("S\n");
-            for(int x = 0;x<5;x++)
-                printf("%d ",d_dist[x]);
-            printf("dist\n");
-            for(int x=0;x<*d_q_curlen;x++)
-                printf("%d ",d_q_cur[x]);
-            printf("cur\n");
-            for(int x=0;x<*d_q_nexlen;x++)
-                printf("%d ",d_q_next[x]);
-            printf("nex\n");
-        }
-        if(id==3)
-        {
-            for(int x = 0;x<5;x++)
-                printf("%d ",d_sigma[x]);
-            printf("sigma\n");
-            for(int x = 0;x<5;x++)
-                printf("%d ",d_ends[x]);
-            printf("ends\n");
-            for(int x = 0;x<5;x++)
-                printf("%d ",d_S[x]);
-            printf("S\n");
-            for(int x = 0;x<5;x++)
-                printf("%d ",d_dist[x]);
-            printf("dist\n");
-            for(int x=0;x<*d_q_curlen;x++)
-                printf("%d ",d_q_cur[x]);
-            printf("cur\n");
-            for(int x=0;x<*d_q_nexlen;x++)
-                printf("%d ",d_q_next[x]);
-            printf("nex\n");
-        }
-        if(id==4)
-        {
-            for(int x = 0;x<5;x++)
-                printf("%d ",d_sigma[x]);
-            printf("sigma\n");
-            for(int x = 0;x<5;x++)
-                printf("%d ",d_ends[x]);
-            printf("ends\n");
-            for(int x = 0;x<5;x++)
-                printf("%d ",d_S[x]);
-            printf("S\n");
-            for(int x = 0;x<5;x++)
-                printf("%d ",d_dist[x]);
-            printf("dist\n");
-            for(int x=0;x<*d_q_curlen;x++)
-                printf("%d ",d_q_cur[x]);
-            printf("cur\n");
-            for(int x=0;x<*d_q_nexlen;x++)
-                printf("%d ",d_q_next[x]);
-            printf("nex\n");
-        }
     }
 }
 
@@ -156,6 +50,11 @@ void singleThread(int * d_ends, int * d_ends_len, int * d_q_nexlen, int * d_q_cu
     *d_q_curlen=*d_q_nexlen;
     *d_S_len+=*d_q_nexlen;
     *d_q_nexlen=0;
+
+    for(int i=0; i < *d_ends_len; ++i)
+        printf("%d \t", d_ends[i]);
+    
+    printf("\n");
 }
 
 
@@ -199,11 +98,6 @@ namespace graphs{
         }
 
         h_dis[0] = 0;
-
-        for(int cc=0;cc<no_nodes;cc++)
-        {
-            printf("%d ",h_dis[cc]);
-        }
         
         Edge * d_edges;
 
@@ -231,12 +125,15 @@ namespace graphs{
 
         int One = 1;
         int Zero = 0;
+        int Two = 2;
+        int initEnd[2] = {0, 1};
 
         // Initialize
         cudaMemcpy(d_q_curlen, &One, sizeof(int), cudaMemcpyHostToDevice);
         cudaMemcpy(d_q_nexlen, &Zero, sizeof(int), cudaMemcpyHostToDevice);
         cudaMemcpy(d_S_len, &One, sizeof(int), cudaMemcpyHostToDevice);
-        cudaMemcpy(d_ends_len, &Zero, sizeof(int), cudaMemcpyHostToDevice);
+        cudaMemcpy(d_ends_len, &Two, sizeof(int), cudaMemcpyHostToDevice);
+        cudaMemcpy(d_ends, initEnd, 2*sizeof(int), cudaMemcpyHostToDevice);
         cudaMemcpy(d_no_nodes, &no_nodes, sizeof(int), cudaMemcpyHostToDevice);
 
         cudaMemcpy(d_q_cur, &Zero, sizeof(int), cudaMemcpyHostToDevice);
@@ -260,6 +157,12 @@ namespace graphs{
         
         cudaMemcpy(&h_depth,d_depth,sizeof(int),cudaMemcpyDeviceToHost);
         cudaMemcpy(h_ends,d_ends,no_nodes * sizeof(int),cudaMemcpyDeviceToHost);
+
+        for(int i=0; i < 5; i++){
+            cout << h_ends[i] << "\t";
+        }
+
+        cout << endl;
 
         int counter = h_depth;
 

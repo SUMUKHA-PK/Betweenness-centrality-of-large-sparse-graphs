@@ -11,83 +11,6 @@
 using namespace std;
 using namespace graphs;
 
-__global__ void kernel(int *d,int *Q,int *Q2,int *R,int *sigma)
-{
-    int n = 5;
-    int s=0;
-
-    int idx = threadIdx.x;
-    //Initialize d and sigma
-    for(int k=idx; k<n; k+=blockDim.x) 
-    {
-        if(k == s)
-        {
-            d[k] = 0;
-            sigma[k] = 1;
-        }
-        else
-        {
-            d[k] = INT_MAX;
-            sigma[k] = 0;
-        }
-    }
-
-    __shared__ int Q_len;
-    __shared__ int Q2_len;
-
-    if(idx == 0)
-    {
-        Q[0] = s;
-        Q_len = 1;
-        Q2_len = 0;
-    }
-    __syncthreads();
-
-    while(1)
-    {
-        for(int k=idx; k<Q_len; k+=blockDim.x)
-        {
-            int v = Q[k];
-            for(int w=R[v]; w<R[v+1]; w++)
-            {
-                // Use atomicCAS to prevent duplicates
-                if(atomicCAS(&d[w],INT_MAX,d[v]+1) == INT_MAX)
-                {
-                    int t = atomicAdd(&Q2_len,1);
-                    Q2[t] = w;
-                }
-                if(d[w] == (d[v]+1))
-                {
-                    atomicAdd(&sigma[w],sigma[v]);
-                }
-            }
-        }
-        __syncthreads();
-
-        if(Q2_len == 0)
-        {
-            //The next vertex frontier is empty, so we're done searching
-            break;
-        }
-        else
-        {
-            for(int k=idx; k<Q2_len; k+=blockDim.x)
-            {
-                Q[k] = Q2[k];
-            }
-
-            __syncthreads();
-
-            if(idx == 0)
-            {
-                Q_len = Q2_len;
-                Q2_len = 0;
-            }
-            __syncthreads();
-        }
-    }
-}
-
 int main(int argc,char ** argv)
 {
     FILE *fp;
@@ -198,10 +121,6 @@ int main(int argc,char ** argv)
         cc+=x;
     }
     a-=ignore;
-    // for(i=0;i<a;i++)
-    // {
-    //     cout<<edges[i].from<<" "<<edges[i].to<<endl;
-    // }
     
     for(i=a;i<2*a;i++)
     {

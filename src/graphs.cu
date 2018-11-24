@@ -21,7 +21,6 @@ void stage1(bool * status, int * d_q_curlen, int * d_q_nexlen, int * d_S_len, in
             if(d_dist[d_edges[current].neighbours[i]]==(d_dist[current]+1))
                 atomicAdd(&d_sigma[d_edges[current].neighbours[i]],d_sigma[current]);
         }
-
         __syncthreads();
     }
 }
@@ -31,30 +30,11 @@ void stage1_1(bool * status, int * d_q_curlen, int * d_q_nexlen, int * d_S_len, 
 {
     int id = threadIdx.x + blockIdx.x*blockDim.x;
 
-    if(id<*d_no_nodes)
+    if(id<*d_q_nexlen)
     {
-        if(*d_q_nexlen==0)
-        {
-            *d_depth=d_dist[d_S[*d_S_len-1]]-1;
-            *status = false;
-        }
-        else
-        {
-            if(id>=0&&id<*d_q_nexlen)
-            {
-                d_q_cur[id]=d_q_next[id];
-                d_S[id+*d_S_len]=d_q_next[id];
-            }
-            __syncthreads();
-            
-            d_ends[*d_ends_len]=d_ends[*d_ends_len-1]+*d_q_nexlen;
-            *d_ends_len++;
-            *d_q_curlen=*d_q_nexlen;
-            *d_S_len+=*d_q_nexlen;
-            *d_q_nexlen=0;
-
-            __syncthreads();
-        }
+        d_q_cur[id]=d_q_next[id];
+        d_S[id+*d_S_len]=d_q_next[id];
+        __syncthreads();
 
         if(id==0)
         {
@@ -163,6 +143,22 @@ void stage1_1(bool * status, int * d_q_curlen, int * d_q_nexlen, int * d_S_len, 
         }
     }
 }
+
+__global__ 
+void single(int * d_depth, int * d_dist, int * d_S, int * d_S_len){
+    *d_depth=d_dist[d_S[*d_S_len-1]]-1;
+}
+
+__global__ 
+void singleThread(int * d_ends, int * d_ends_len, int * d_q_nexlen, int * d_q_curlen, int * d_S_len){
+    d_ends[*d_ends_len]=d_ends[*d_ends_len-1]+*d_q_nexlen;
+    *d_ends_len = *d_ends_len + 1;
+    *d_q_curlen=*d_q_nexlen;
+    *d_S_len+=*d_q_nexlen;
+    *d_q_nexlen=0;
+}
+
+
 __global__
 void stage2(int * d_delta, int *  d_dist, int *  d_sigma, int * d_S, Edge * d_edges, int offset,int itr){        
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -189,15 +185,17 @@ namespace graphs{
 
     void calculateBC(Edge * h_edges, int no_nodes){
 
-        int * d_q_curlen, * d_q_nexlen, * d_depth, * d_S_len, * d_ends_len, * d_no_nodes;
+        int * d_q_curlen, * d_q_nexlen, * d_depth, * d_S_len, * d_ends_len, * d_no_nodes, h_q_nexlen;
 
         int * d_q_cur, * d_q_next, * d_sigma, * d_delta, * d_S, * d_ends, * d_dist, * h_ends, h_depth;
 
         int * h_dis = new int[no_nodes];
         h_ends = new int[no_nodes];
+
         for(int cc=0;cc<no_nodes;cc++)
         {
-            h_dis[cc]=INT_MAX;
+            h_ends[cc] = 0;
+            h_dis[cc] = INT_MAX;
         }
 
         h_dis[0] = 0;
@@ -209,7 +207,7 @@ namespace graphs{
         
         Edge * d_edges;
 
-        bool h_status, * d_status;
+        bool * d_status;
 
         cudaMalloc((void **)&d_q_curlen, sizeof(int));
         cudaMalloc((void **)&d_q_nexlen, sizeof(int));
@@ -238,27 +236,26 @@ namespace graphs{
         cudaMemcpy(d_q_curlen, &One, sizeof(int), cudaMemcpyHostToDevice);
         cudaMemcpy(d_q_nexlen, &Zero, sizeof(int), cudaMemcpyHostToDevice);
         cudaMemcpy(d_S_len, &One, sizeof(int), cudaMemcpyHostToDevice);
-        cudaMemcpy(d_ends_len, &One, sizeof(int), cudaMemcpyHostToDevice);
+        cudaMemcpy(d_ends_len, &Zero, sizeof(int), cudaMemcpyHostToDevice);
         cudaMemcpy(d_no_nodes, &no_nodes, sizeof(int), cudaMemcpyHostToDevice);
 
         cudaMemcpy(d_q_cur, &Zero, sizeof(int), cudaMemcpyHostToDevice);
         cudaMemcpy(d_sigma, &One, sizeof(int), cudaMemcpyHostToDevice);
         cudaMemcpy(d_S, &Zero, sizeof(int), cudaMemcpyHostToDevice);
-        cudaMemcpy(d_ends, &Zero, sizeof(int), cudaMemcpyHostToDevice);
         cudaMemcpy(d_dist, h_dis, no_nodes*sizeof(int), cudaMemcpyHostToDevice);
            
         cudaMemcpy(d_edges, h_edges, no_nodes*sizeof(Edge), cudaMemcpyHostToDevice);
 
         while(1){
-            cout << "Hi " << endl;
-            h_status = true;
-            cudaMemcpy(d_status, &h_status, sizeof(bool), cudaMemcpyHostToDevice);
             stage1<<<10,10>>>(d_status,d_q_curlen,d_q_nexlen,d_S_len,d_ends_len,d_q_cur,d_q_next,d_sigma,d_delta,d_S,d_ends,d_dist,d_depth,d_no_nodes,d_edges);
-            stage1_1<<<10,10>>>(d_status,d_q_curlen,d_q_nexlen,d_S_len,d_ends_len,d_q_cur,d_q_next,d_sigma,d_delta,d_S,d_ends,d_dist,d_depth,d_no_nodes,d_edges);
-            cudaMemcpy(&h_status, d_status, sizeof(bool), cudaMemcpyDeviceToHost);
-            printf("rwlb\ns %d \n",h_status);
-            if(h_status == false)
+            cudaMemcpy(&h_q_nexlen, d_q_nexlen, sizeof(int), cudaMemcpyDeviceToHost);
+ 
+            if(h_q_nexlen==0){
+                single<<<1, 1>>>(d_depth, d_dist, d_S, d_S_len);
                 break;
+            }
+            stage1_1<<<10,10>>>(d_status,d_q_curlen,d_q_nexlen,d_S_len,d_ends_len,d_q_cur,d_q_next,d_sigma,d_delta,d_S,d_ends,d_dist,d_depth,d_no_nodes,d_edges);
+            singleThread<<<1, 1>>>(d_ends, d_ends_len, d_q_nexlen, d_q_curlen, d_S_len);
         }
         
         cudaMemcpy(&h_depth,d_depth,sizeof(int),cudaMemcpyDeviceToHost);

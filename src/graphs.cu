@@ -1,17 +1,52 @@
 #include "graphs.cuh"
 
 __global__
-void stage1(int * d_q_curlen, int * d_q_nexlen, int * d_S_len, int * d_ends_len, int * d_q_cur, int * d_q_next, int * d_sigma, int * d_delta, int * d_S, int * d_ends, int * d_dist, Edge * d_edges){        
+void stage1(bool * status, int * d_q_curlen, int * d_q_nexlen, int * d_S_len, int * d_ends_len, int * d_q_cur, int * d_q_next, int * d_sigma, int * d_delta, int * d_S, int * d_ends, int * d_dist,int* d_depth, Edge * d_edges){        
     
     int id = threadIdx.x + blockIdx.x*blockDim.x;
 
-    for(id=0;i<d_q_curlen;i++)
+    
+    for(int i=0;i<edges[id].no_neigh;i++)
     {
-        for(int i=0;i<edges[id].no_neigh;i++)
+        if(atomicCAS(d_d[i],INT_MAX,d_d[id]+1)==INT_MAX)
         {
-            if(atomicCAS(d_))
+            int temp = atomicAdd(d_q_nexlen,1);
+            d_q_next[temp]=i;
         }
+        if(d_d[i]==(d_d[id]+1))
+            atomicAdd(d_sigma[i],d_sigma[id]);
     }
+
+    __syncthreads();
+
+    if(*d_q_nexlen==0)
+    {
+        *d_depth=d_d[d_S[*d_S_len-1]]-1;
+        *status = false;
+    }
+    else
+    {
+        if(id>=0&&id<d_q_nexlen)
+        {
+            d_q_cur[id]=d_q_next[id];
+            d_S[id+*d_S_len]=d_q_next[id];
+        }
+        __syncthreads();
+        
+        d_ends[*d_ends_len]=d_ends[*d_ends_len-1]+d_q_nexlen;
+        *d_ends_len++;
+        *d_q_curlen=*d_q_nexlen;
+        *d_S_len+=*d_q_nexlen;
+        *d_q_nexlen=0;
+
+        __syncthreads();
+    }
+}
+
+__device__
+void stage2(int * d_ends,int * d_depth,int * d_S,int * d_sigma, int * d_delta, int * d_dist)
+{
+
 }
 
 namespace graphs{
@@ -20,7 +55,7 @@ namespace graphs{
 
         int * d_q_curlen, * d_q_nexlen, * d_depth, * d_S_len, * d_ends_len;
 
-        int * d_q_cur, * d_q_next, * d_sigma, * d_delta, * d_S, * d_ends, * d_dist;
+        int * d_q_cur, * d_q_next, * d_sigma, * d_delta, * d_S, * d_ends, * d_dist, * h_depth;
         
         Edge * d_edges;
 
@@ -42,12 +77,14 @@ namespace graphs{
 
         int One = 1;
         int Zero = 0;
-
+        bool h_status = false;
+        bool * d_status;
         // Initialize
         cudaMemcpy(d_q_curlen, &One, sizeof(int), cudaMemcpyHostToDevice);
         cudaMemcpy(d_q_nexlen, &Zero, sizeof(int), cudaMemcpyHostToDevice);
         cudaMemcpy(d_S_len, &One, sizeof(int, cudaMemcpyHostToDevice));
         cudaMemcpy(d_ends_len, &One, sizeof(int), cudaMemcpyHostToDevice);
+        cudaMemcpy(d_status, &h_status, sizeof(bool), cudaMemcpyHostToDevice);
 
         cudaMemcpy(d_q_cur, &Zero, sizeof(int), cudaMemcpyHostToDevice);
         cudaMemcpy(d_sigma, &One, sizeof(int), cudaMemcpyHostToDevice);
@@ -57,5 +94,32 @@ namespace graphs{
            
         cudaMemcpy(d_edges, h_edges, no_nodes*sizeof(Edge), cudaMemcpyHostToDevice);
 
+        while(1)
+        {
+            stage1<<<10,10>>>(d_status,d_q_curlen,d_q_nexlen,d_S_len,d_ends_len,d_q_cur,d_q_next,d_sigma,d_delta,d_S,d_ends,d_dist,d_depth,d_edges);
+            cuda
+        }
+        
+        cudaMemcpy(h_depth,d_depth,sizeof(int),cudaMemcpyDeviceToHost);
+
+        cudaFree(d_q_curlen);
+        cudaFree(d_q_nexlen);
+        cudaFree(d_depth);
+        cudaFree(d_S_len);
+        cudaFree(d_ends_len);
+
+        cudaFree(d_q_cur);
+        cudaFree(d_q_next);
+        cudaFree(d_sigma);
+        cudaFree(d_delta);
+        cudaFree(d_S);
+        cudaFree(d_ends);
+        cudaFree(d_dist);
+
+        int counter = h_depth;
+
+
+        while()
+            stage2<<<10,10>>>();
     }
 }

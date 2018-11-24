@@ -59,11 +59,14 @@ namespace graphs{
         
         Edge * d_edges;
 
+        bool h_status, * d_status;
+
         cudaMalloc((void **)&d_q_curlen, sizeof(int));
         cudaMalloc((void **)&d_q_nexlen, sizeof(int));
         cudaMalloc((void **)&d_depth, sizeof(int));
         cudaMalloc((void **)&d_S_len, sizeof(int));
         cudaMalloc((void **)&d_ends_len, sizeof(int));
+        cudaMalloc((void **)&d_status, sizeof(bool));
 
         cudaMalloc((void **)&d_q_cur, no_nodes*sizeof(int));
         cudaMalloc((void **)&d_q_next, no_nodes*sizeof(int));
@@ -77,14 +80,12 @@ namespace graphs{
 
         int One = 1;
         int Zero = 0;
-        bool h_status = false;
-        bool * d_status;
+
         // Initialize
         cudaMemcpy(d_q_curlen, &One, sizeof(int), cudaMemcpyHostToDevice);
         cudaMemcpy(d_q_nexlen, &Zero, sizeof(int), cudaMemcpyHostToDevice);
         cudaMemcpy(d_S_len, &One, sizeof(int, cudaMemcpyHostToDevice));
         cudaMemcpy(d_ends_len, &One, sizeof(int), cudaMemcpyHostToDevice);
-        cudaMemcpy(d_status, &h_status, sizeof(bool), cudaMemcpyHostToDevice);
 
         cudaMemcpy(d_q_cur, &Zero, sizeof(int), cudaMemcpyHostToDevice);
         cudaMemcpy(d_sigma, &One, sizeof(int), cudaMemcpyHostToDevice);
@@ -94,10 +95,14 @@ namespace graphs{
            
         cudaMemcpy(d_edges, h_edges, no_nodes*sizeof(Edge), cudaMemcpyHostToDevice);
 
-        while(1)
-        {
+        while(1){
+            h_status = true;
+            cudaMemcpy(d_status, &h_status, sizeof(bool), cudaMemcpyHostToDevice);
             stage1<<<10,10>>>(d_status,d_q_curlen,d_q_nexlen,d_S_len,d_ends_len,d_q_cur,d_q_next,d_sigma,d_delta,d_S,d_ends,d_dist,d_depth,d_edges);
-            cuda
+            cudaMemcpy(&h_status, d_status, sizeof(bool), cudaMemcpyDeviceToHost);
+
+            if(h_status == false)
+                break;
         }
         
         cudaMemcpy(h_depth,d_depth,sizeof(int),cudaMemcpyDeviceToHost);

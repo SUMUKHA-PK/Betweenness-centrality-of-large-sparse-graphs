@@ -90,28 +90,18 @@ int main(int argc,char ** argv)
     long long int dim2=n4[0],dim1=n4[1];
     Edge * edges = new Edge[dim1];   //Number of edges is size of n1
     Vertex * vertices = new Vertex[dim2];
-
-    for(i=0;i<dim1;i++)
-        edges[i]->item=NULL;
     
     long long cc =0,cd=0,ignore=0;
     for(i=1;i<=dim1;i++)
     {
-        vertices[i-1].id=i-1;
+        edges[i-1].no_neigh=0;
         long long x = n2[i]-n2[i-1];
         for(j=cc;j<cc+x;j++)
         {
             if((i-1)!=n3[j])
             {
-                edges[i-1].from=(i-1);
-                edges[cd].to=n3[j];
-                cd++;
-                Item * temp = edges[i-1].item;
-                while(temp->item!=NULL)
-                    temp=temp->item;
-                Item *t = new Item;
-                temp->item=t;
-                t->item=NULL;
+                edges[i-1].neighbours[edges[i-1].no_neigh] = j;
+                edges[i-1].no_neigh+=1;
             }
             else
             {   
@@ -121,12 +111,11 @@ int main(int argc,char ** argv)
         cc+=x;
     }
     a-=ignore;
-    
-    for(i=a;i<2*a;i++)
-    {
-        edges[i].from=edges[i-a].to;
-        edges[i].to=edges[i-a].from;
+
+    for(int i = 0; i < dim1; i++){
+        cout << edges[i].neighbours << endl;
     }
+
     free(n1);
     free(n2);
     free(n3);

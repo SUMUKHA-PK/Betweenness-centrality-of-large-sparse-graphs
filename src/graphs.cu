@@ -3,6 +3,15 @@
 __global__
 void stage1(int * d_q_curlen, int * d_q_nexlen, int * d_S_len, int * d_ends_len, int * d_q_cur, int * d_q_next, int * d_sigma, int * d_delta, int * d_S, int * d_ends, int * d_dist, Edge * d_edges){        
     
+    int id = threadIdx.x + blockIdx.x*blockDim.x;
+
+    for(id=0;i<d_q_curlen;i++)
+    {
+        for(int i=0;i<edges[id].no_neigh;i++)
+        {
+            if(atomicCAS(d_))
+        }
+    }
 }
 
 namespace graphs{

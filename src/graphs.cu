@@ -50,11 +50,6 @@ void singleThread(int * d_ends, int * d_ends_len, int * d_q_nexlen, int * d_q_cu
     *d_q_curlen=*d_q_nexlen;
     *d_S_len+=*d_q_nexlen;
     *d_q_nexlen=0;
-
-    for(int i=0; i < *d_ends_len; ++i)
-        printf("%d \t", d_ends[i]);
-    
-    printf("\n");
 }
 
 
@@ -157,10 +152,6 @@ namespace graphs{
         
         cudaMemcpy(&h_depth,d_depth,sizeof(int),cudaMemcpyDeviceToHost);
         cudaMemcpy(h_ends,d_ends,no_nodes * sizeof(int),cudaMemcpyDeviceToHost);
-
-        for(int i=0; i < 5; i++){
-            cout << h_ends[i] << "\t";
-        }
 
         cout << endl;
 

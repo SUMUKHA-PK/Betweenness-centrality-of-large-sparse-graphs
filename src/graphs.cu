@@ -8,20 +8,6 @@ void stage1(bool * status, int * d_q_curlen, int * d_q_nexlen, int * d_S_len, in
     
     int id = threadIdx.x + blockIdx.x*blockDim.x;
 
-    if(id < no_nodes){
-
-        printf("%d\n", id);
-        for(int i=0;i<d_edges[id].no_neigh;i++){
-            if(atomicCAS(&d_dist[i],INT_MAX,d_dist[id]+1)==INT_MAX){
-                int temp = atomicAdd(d_q_nexlen,1);
-                d_q_next[temp]=i;
-            }
-            if(d_dist[i]==(d_dist[id]+1))
-                atomicAdd(&d_sigma[i],d_sigma[id]);
-        }
-    
-        __syncthreads();
-    
     if(id<*d_no_nodes)
     {
         for(int i=0;i<d_edges[id].no_neigh;i++)

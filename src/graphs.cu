@@ -177,7 +177,7 @@ void stage2(int * d_delta, int *  d_dist, int *  d_sigma, int * d_S, Edge * d_ed
 
         for(int i = 0; i < d_edges[w].no_neigh; i++){
             int v = d_edges[w].neighbours[i];
-            if(d_dist[] == d_dist[w] + 1){
+            if(d_dist[v] == d_dist[w] + 1){
                 dsw += (float) sw * (1 + d_delta[v]) / d_sigma[v];
             }
         }
@@ -196,7 +196,7 @@ namespace graphs{
         int * d_q_cur, * d_q_next, * d_sigma, * d_delta, * d_S, * d_ends, * d_dist, * h_ends, h_depth;
 
         int * h_dis = new int[no_nodes];
-
+        h_ends = new int[no_nodes];
         for(int cc=0;cc<no_nodes;cc++)
         {
             h_dis[cc]=INT_MAX;
@@ -269,8 +269,8 @@ namespace graphs{
         int counter = h_depth;
 
         while(counter >= 0){
-            int offset = ends[depth];
-            int itr = ends[depth + 1] - 1 - offset;
+            int offset = h_ends[counter];
+            int itr = h_ends[counter + 1] - 1 - offset;
 
             int blocks = ceil((float)itr/size);
             stage2<<<blocks,size>>>(d_delta, d_dist, d_sigma, d_S, d_edges, offset, itr);

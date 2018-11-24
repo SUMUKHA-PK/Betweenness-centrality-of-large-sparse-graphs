@@ -87,11 +87,10 @@ int main(int argc,char ** argv)
 
 //-------------------------------------------File input done------------------------------
 
-    long long int dim2=n4[0],dim1=n4[1];
+    long long int dim1=n4[1];
     Edge * edges = new Edge[dim1];   //Number of edges is size of n1
-    Vertex * vertices = new Vertex[dim2];
     
-    long long cc =0,cd=0,ignore=0;
+    long long cc =0,ignore=0;
     for(i=1;i<=dim1;i++)
     {
         edges[i-1].no_neigh=0;
@@ -100,7 +99,7 @@ int main(int argc,char ** argv)
         {
             if((i-1)!=n3[j])
             {
-                edges[i-1].neighbours[edges[i-1].no_neigh] = j;
+                edges[i-1].neighbours[edges[i-1].no_neigh] = n3[j];
                 edges[i-1].no_neigh+=1;
             }
             else
@@ -113,7 +112,12 @@ int main(int argc,char ** argv)
     a-=ignore;
 
     for(int i = 0; i < dim1; i++){
-        cout << edges[i].neighbours << endl;
+        cout << edges[i].no_neigh << endl;
+
+        for(int j=0; j<edges[i].no_neigh; j++)
+            cout << edges[i].neighbours[j] << "\t";
+
+        cout << endl << endl;
     }
 
     free(n1);

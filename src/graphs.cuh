@@ -5,40 +5,14 @@
 
 using namespace std;
 
-namespace graphs
-{   
-    typedef struct i
-    {
-        long long id;
-        struct i * item;
-    } Item;
+namespace graphs{
 
-    typedef struct vertex
-    {
-        Item * item;
-        long long id;
-        bool visited;
-        bool inQ;
-        long long distance;
-    } Vertex;
-    
-    typedef struct edge
-    {
-        Item * item;
-        Item * from;
+    typedef struct edge{
+        int tos[10];
+        int no_to;
     } Edge;
     
-    class graph
-    {
-
-    public:
-
-        void call_bfs(int ** G);
-
-        Vertex * vs;
-        Edge * es;
-
-    };
+    void calculateBC(Edge * edges, int no_edges);
 }
 
 #endif

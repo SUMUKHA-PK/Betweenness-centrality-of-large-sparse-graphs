@@ -152,9 +152,7 @@ namespace graphs{
         
         cudaMemcpy(&h_depth,d_depth,sizeof(int),cudaMemcpyDeviceToHost);
         cudaMemcpy(h_ends,d_ends,no_nodes * sizeof(int),cudaMemcpyDeviceToHost);
-
-        cout << endl;
-
+        
         int counter = h_depth;
 
         while(counter >= 0){

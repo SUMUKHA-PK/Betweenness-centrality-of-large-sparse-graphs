@@ -63,8 +63,7 @@ void stage1(bool * status, int * d_q_curlen, int * d_q_nexlen, int * d_S_len, in
 }
 
 __global__
-void stage1(bool * status, int * d_q_curlen, int * d_q_nexlen, int * d_S_len, int * d_ends_len, int * d_q_cur, int * d_q_next, int * d_sigma, int * d_delta, int * d_S, int * d_ends, int * d_dist,int* d_depth, Edge * d_edges){        
-    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+void stage2(bool * status, int * d_q_curlen, int * d_q_nexlen, int * d_S_len, int * d_ends_len, int * d_q_cur, int * d_q_next, int * d_sigma, int * d_delta, int * d_S, int * d_ends, int * d_dist,int* d_depth, Edge * d_edges){  
 }
 
 namespace graphs{
@@ -77,7 +76,7 @@ namespace graphs{
 
         int * h_dis = new int[no_nodes];
 
-        h_dis = { INT_MAX };
+        h_dis[no_nodes] = { INT_MAX };
 
         h_dis[0] = 0;
         
@@ -149,7 +148,7 @@ namespace graphs{
 
 
         while(counter--){
-            stage2<<<10,10>>>();
+            //stage2<<<10,10>>>();
         }
     }
 }

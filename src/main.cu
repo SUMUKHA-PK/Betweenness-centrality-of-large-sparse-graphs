@@ -6,10 +6,34 @@
 #include<iostream>
 #include<vector>
 #include<string>
+#include <ctime>
 #include"graphs.cuh"
 
 using namespace std;
 using namespace graphs;
+
+void printDevProp(cudaDeviceProp devProp){
+    
+    // printf("Compute Capability:            %d.%d\n",  devProp.major, devProp.minor);
+    printf("Device Name:                   %s\n",  devProp.name);
+    // printf("Total global memory:           %zu\n",  devProp.totalGlobalMem);
+    // printf("Total shared memory per block: %zu\n",  devProp.sharedMemPerBlock);
+    // printf("Total registers per block:     %d\n",  devProp.regsPerBlock);
+    // printf("Warp size:                     %d threads\n",  devProp.warpSize);
+    // printf("Maximum memory pitch:          %zu\n",  devProp.memPitch);
+    // printf("Maximum threads per block:     %d\n",  devProp.maxThreadsPerBlock);
+    // for (int i = 0; i < 3; ++i)
+    // 	printf("Maximum dimension %d of block:  %d\n", i, devProp.maxThreadsDim[i]);
+    // for (int i = 0; i < 3; ++i)
+    // 	printf("Maximum dimension %d of grid:   %d\n", i, devProp.maxGridSize[i]);
+    printf("Clock rate:                    %d\n",  devProp.clockRate);
+    // printf("Total constant memory:         %zu\n",  devProp.totalConstMem);
+    // printf("Texture alignment:             %zu\n",  devProp.textureAlignment);
+    // printf("Concurrent copy and execution: %s\n",  (devProp.deviceOverlap ? "Yes" : "No"));
+    // printf("Number of multiprocessors:     %d\n",  devProp.multiProcessorCount);
+    // printf("Kernel execution timeout:      %s\n",  (devProp.kernelExecTimeoutEnabled ? "Yes" : "No"));
+    return;
+}
 
 int main(int argc,char ** argv)
 {
@@ -87,31 +111,20 @@ int main(int argc,char ** argv)
 
 //-------------------------------------------File input done------------------------------
 
-    long long int dim2=n4[0],dim1=n4[1];
+    long long int dim1=n4[1];
     Edge * edges = new Edge[dim1];   //Number of edges is size of n1
-    Vertex * vertices = new Vertex[dim2];
-
-    for(i=0;i<dim1;i++)
-        edges[i]->item=NULL;
     
-    long long cc =0,cd=0,ignore=0;
+    long long cc =0,ignore=0;
     for(i=1;i<=dim1;i++)
     {
-        vertices[i-1].id=i-1;
+        edges[i-1].no_neigh=0;
         long long x = n2[i]-n2[i-1];
         for(j=cc;j<cc+x;j++)
         {
             if((i-1)!=n3[j])
             {
-                edges[i-1].from=(i-1);
-                edges[cd].to=n3[j];
-                cd++;
-                Item * temp = edges[i-1].item;
-                while(temp->item!=NULL)
-                    temp=temp->item;
-                Item *t = new Item;
-                temp->item=t;
-                t->item=NULL;
+                edges[i-1].neighbours[edges[i-1].no_neigh] = n3[j];
+                edges[i-1].no_neigh+=1;
             }
             else
             {   
@@ -121,12 +134,25 @@ int main(int argc,char ** argv)
         cc+=x;
     }
     a-=ignore;
-    
-    for(i=a;i<2*a;i++)
-    {
-        edges[i].from=edges[i-a].to;
-        edges[i].to=edges[i-a].from;
-    }
+
+    cudaDeviceProp devProp;
+
+    printDevProp(devProp);
+
+    cout << "Started Computing ...." << endl;
+
+    clock_t begin = clock();
+
+    calculateBC(edges, dim1);    
+
+    clock_t end = clock();
+
+    cout << "Completed Computing ...." << endl;
+
+    double elapsed_secs = double(end - begin) / (CLOCKS_PER_SEC * 1000);
+
+    cout << "Elapsed Time : " << elapsed_secs << endl;
+
     free(n1);
     free(n2);
     free(n3);

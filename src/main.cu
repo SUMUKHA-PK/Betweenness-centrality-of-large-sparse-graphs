@@ -141,19 +141,19 @@ int main(int argc,char ** argv)
 
     printDevProp(devProp);
 
-    cout << "Started Computing ...." << endl;
+    cout << "Started Computing ...." << endl << endl;
 
     clock_t begin = clock();
 
     calculateBC(edges, dim1);    
 
     clock_t end = clock();
-
-    cout << "Completed Computing ...." << endl;
-
+    
     double elapsed_secs = double(end - begin) / (CLOCKS_PER_SEC * 1000);
 
     cout << "Elapsed Time : " << elapsed_secs << endl;
+
+    cout << endl << "Completed Computing ...." << endl;
 
     free(n1);
     free(n2);

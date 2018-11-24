@@ -136,6 +136,7 @@ int main(int argc,char ** argv)
     a-=ignore;
 
     cudaDeviceProp devProp;
+    cudaGetDeviceProperties(&devProp, 0);
 
     printDevProp(devProp);
 

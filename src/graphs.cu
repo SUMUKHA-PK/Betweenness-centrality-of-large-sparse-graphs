@@ -124,7 +124,8 @@ namespace graphs{
         int counter = h_depth;
 
 
-        while()
+        while(){
             stage2<<<10,10>>>();
+        }
     }
 }

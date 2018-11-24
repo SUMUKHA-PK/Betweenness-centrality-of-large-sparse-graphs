@@ -156,13 +156,7 @@ namespace graphs{
         
         cudaMemcpy(&h_depth,d_depth,sizeof(int),cudaMemcpyDeviceToHost);
         cudaMemcpy(h_ends,d_ends,no_nodes * sizeof(int),cudaMemcpyDeviceToHost);
-
-        for(int i=0; i < 5; i++){
-            cout << h_ends[i] << "\t";
-        }
-
-        cout << endl;
-
+        
         int counter = h_depth;
 
         cout<<"Counter "<<counter<<endl;

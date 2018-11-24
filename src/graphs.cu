@@ -44,11 +44,10 @@ void stage1(bool * status, int * d_q_curlen, int * d_q_nexlen, int * d_S_len, in
     }
 }
 
-// __device__
-// void stage2(int * d_ends,int * d_depth,int * d_S,int * d_sigma, int * d_delta, int * d_dist)
-// {
-
-// }
+__global__
+void stage1(bool * status, int * d_q_curlen, int * d_q_nexlen, int * d_S_len, int * d_ends_len, int * d_q_cur, int * d_q_next, int * d_sigma, int * d_delta, int * d_S, int * d_ends, int * d_dist,int* d_depth, Edge * d_edges){        
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+}
 
 namespace graphs{
 
@@ -125,8 +124,8 @@ namespace graphs{
         int counter = h_depth;
 
 
-        // while(){
-        //     stage2<<<10,10>>>();
-        // }
+        while(counter--){
+            stage2<<<10,10>>>();
+        }
     }
 }

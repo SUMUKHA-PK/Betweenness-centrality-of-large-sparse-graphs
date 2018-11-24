@@ -52,13 +52,12 @@ void singleThread(int * d_ends, int * d_ends_len, int * d_q_nexlen, int * d_q_cu
     *d_q_nexlen=0;
 }
 
-
 __global__
-void stage2(int * d_delta, int *  d_dist, int *  d_sigma, int * d_S, Edge * d_edges, int * offset, int itr){        
+void stage2_2(int * d_delta, int *  d_dist, int *  d_sigma, int * d_S, Edge * d_edges, int offset, int itr){
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
-    
+
     if(idx <= itr){
-        int tid = idx + *offset;
+        int tid = idx + offset;
         int w = d_S[tid];
         float dsw = 0;
         int sw = d_sigma[w];
@@ -70,13 +69,14 @@ void stage2(int * d_delta, int *  d_dist, int *  d_sigma, int * d_S, Edge * d_ed
             }
         }
         d_delta[w] = (int)dsw;
-    
-        for(int g=0;g<5;g++)
-        {
-            printf("%d ",d_delta[g]);
-        }printf("\n");
+
         __syncthreads();
     }
+}
+
+__global__
+void stage2(int * d_delta, int *  d_dist, int *  d_sigma, int * d_S, Edge * d_edges, int offset, int itr, int blocks){        
+    stage2_2<<<blocks, size>>>(d_delta,  d_dist,  d_sigma, d_S, d_edges, offset, itr);
 }
 
 namespace graphs{
@@ -159,18 +159,18 @@ namespace graphs{
         
         int counter = h_depth;
 
-        cout<<"Counter "<<counter<<endl;
-        while(counter >= 0){
-            int offset = h_ends[counter];
-            int * d_offset;
+        int offset;
 
-            cudaMalloc((void **)&d_offset, sizeof(int));
-            cudaMemcpy(d_q_curlen, &offset, sizeof(int), cudaMemcpyHostToDevice);
+        while(counter >= 0){
+
+            offset = h_ends[counter];
 
             int itr = h_ends[counter + 1] - 1 - offset;
 
             int blocks = ceil((float)itr/size);
-            stage2<<<blocks,size>>>(d_delta, d_dist, d_sigma, d_S, d_edges, d_offset, itr);
+
+            stage2<<<1,1>>>(d_delta, d_dist, d_sigma, d_S, d_edges, offset, itr, blocks);
+
             counter --;
         }
 

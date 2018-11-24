@@ -11,8 +11,13 @@ namespace graphs{
         int neighbours[10];
         int no_neigh;
     } Edge;
+
+    typedef struct result{
+        double time;
+        int delta;
+    } Results;
     
-    void calculateBC(Edge * edges, int no_nodes);
+    Results calculateBC(Edge * edges, int no_nodes, int threads);
 }
 
 #endif

@@ -6,7 +6,6 @@
 #include<iostream>
 #include<vector>
 #include<string>
-#include <ctime>
 #include"graphs.cuh"
 #include"graphs.cu"
 #include<math.h>
@@ -144,16 +143,13 @@ int main(int argc,char ** argv)
 
     cout << "Started Computing ...." << endl << endl;
 
-    clock_t begin = clock();
+    //int * results= 
+    Results res = calculateBC(edges, dim1, devProp.maxThreadsDim[0]);    
 
-    //int * results = 
-    calculateBC(edges, dim1);    
-
-    clock_t end = clock();
+    cout << "Elapsed Time : " << res.time << endl;
+    cout << res.delta << endl;
     
-    double elapsed_secs = double(end - begin) / (CLOCKS_PER_SEC * 1000);
-
-    cout << "Elapsed Time : " << elapsed_secs << endl;
+    cout << endl;
 
     cout << endl << "Completed Computing ...." << endl;
 
@@ -165,7 +161,7 @@ int main(int argc,char ** argv)
     
 //---------------------------------------------Graph is generated--------------------------
 
-    float results[5] = {1.010212012,1.010212012,1.010212012,1.010212012,1.010212012};
+    double results[5] = {1.010212012,1.010212012,1.010212012,1.010212012,1.010212012};
     printf("+------------------+-------------+\n");
     printf("| Number of nodes  |  Time taken |\n");
     for(i=0;i<5;i++)

@@ -1,7 +1,8 @@
 #include "graphs.cuh"
-using namespace graphs;
+#include <ctime>
+#include <algorithm>
 
-#define size 8
+using namespace graphs;
 
 __global__
 void stage1(bool * status, int * d_q_curlen, int * d_q_nexlen, int * d_S_len, int * d_ends_len, int * d_q_cur, int * d_q_next, int * d_sigma, int * d_delta, int * d_S, int * d_ends, int * d_dist,int* d_depth, int * d_no_nodes, Edge * d_edges){        
@@ -61,7 +62,7 @@ void stage2_2(int * d_delta, int *  d_dist, int *  d_sigma, int * d_S, Edge * d_
         int w = d_S[tid];
         float dsw = 0;
         int sw = d_sigma[w];
-
+    
         for(int i = 0; i < d_edges[w].no_neigh; i++){
             int v = d_edges[w].neighbours[i];
             if(d_dist[v] == d_dist[w] + 1){
@@ -74,14 +75,16 @@ void stage2_2(int * d_delta, int *  d_dist, int *  d_sigma, int * d_S, Edge * d_
     }
 }
 
-// __global__
-// void stage2(int * d_delta, int *  d_dist, int *  d_sigma, int * d_S, Edge * d_edges, int offset, int itr, int blocks){        
-//     stage2_2<<<blocks, size>>>(d_delta,  d_dist,  d_sigma, d_S, d_edges, offset, itr);
-// }
 
 namespace graphs{
 
-    void calculateBC(Edge * h_edges, int no_nodes){
+    Results calculateBC(Edge * h_edges, int no_nodes, int threads){
+
+        clock_t begin = clock();
+
+        int t = min(no_nodes, threads);
+
+        #define size t
 
         int * d_q_curlen, * d_q_nexlen, * d_depth, * d_S_len, * d_ends_len, * d_no_nodes, h_q_nexlen;
 
@@ -170,8 +173,6 @@ namespace graphs{
 
             int blocks = ceil((float)(itr+1)/size);
 
-            cout << blocks << endl;
-
             stage2_2<<<blocks, size>>>(d_delta, d_dist, d_sigma, d_S, d_edges, (const int)offset, (const int)itr);
 
             counter --;
@@ -181,12 +182,6 @@ namespace graphs{
         
         cudaMemcpy(h_delta, d_delta, no_nodes * sizeof(int),cudaMemcpyDeviceToHost);
         
-        for(int i=0; i < no_nodes; i++){
-            cout << h_delta[i] << "\t"; 
-        }
-
-        cout << endl;
-
         cudaFree(d_q_curlen);
         cudaFree(d_q_nexlen);
         cudaFree(d_depth);
@@ -200,5 +195,17 @@ namespace graphs{
         cudaFree(d_S);
         cudaFree(d_ends);
         cudaFree(d_dist);
+
+        clock_t end = clock();
+
+        double elapsed_secs = double(end - begin) / (CLOCKS_PER_SEC * 1000);
+        
+        Results res;
+
+        res.time = elapsed_secs;
+
+        res.delta = *max_element(h_delta, h_delta + no_nodes);
+
+        return res;
     }
 }

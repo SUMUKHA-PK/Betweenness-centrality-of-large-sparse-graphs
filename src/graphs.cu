@@ -8,19 +8,18 @@ void stage1(bool * status, int * d_q_curlen, int * d_q_nexlen, int * d_S_len, in
     
     int id = threadIdx.x + blockIdx.x*blockDim.x;
 
-    if(id<*d_no_nodes)
-    {
-        for(int i=0;i<d_edges[id].no_neigh;i++)
+    if(id<*d_q_curlen)
+    {   
+        int current = d_q_cur[id];
+        for(int i=0;i<d_edges[current].no_neigh;i++)
         {
-            if(atomicCAS(&d_dist[d_edges[id].neighbours[i]],INT_MAX,d_dist[id]+1)==INT_MAX)
+            if(atomicCAS(&d_dist[d_edges[current].neighbours[i]],INT_MAX,d_dist[current]+1)==INT_MAX)
             {
-                printf("%d netlen,id %d \n",*d_q_nexlen,id);
                 int temp = atomicAdd(d_q_nexlen,1);
-                printf("%d netlen,id %d\n",*d_q_nexlen,id);
-                d_q_next[temp]=d_edges[id].neighbours[i];
+                d_q_next[temp]=d_edges[current].neighbours[i];
             }
-            if(d_dist[d_edges[id].neighbours[i]]==(d_dist[id]+1))
-                atomicAdd(&d_sigma[d_edges[id].neighbours[i]],d_sigma[id]);
+            if(d_dist[d_edges[current].neighbours[i]]==(d_dist[current]+1))
+                atomicAdd(&d_sigma[d_edges[current].neighbours[i]],d_sigma[current]);
         }
 
         __syncthreads();
@@ -34,7 +33,6 @@ void stage1_1(bool * status, int * d_q_curlen, int * d_q_nexlen, int * d_S_len, 
 
     if(id<*d_no_nodes)
     {
-        printf("%d netlen,id %d\n",*d_q_nexlen,id);
         if(*d_q_nexlen==0)
         {
             *d_depth=d_dist[d_S[*d_S_len-1]]-1;

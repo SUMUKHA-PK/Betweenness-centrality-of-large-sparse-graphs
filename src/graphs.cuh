@@ -16,6 +16,7 @@ namespace graphs
     typedef struct vertex
     {
         Item * item;
+        long long id;
         bool visited;
         bool inQ;
         long long distance;
@@ -24,6 +25,7 @@ namespace graphs
     typedef struct edge
     {
         Item * item;
+        Item * from;
     } Edge;
     
     class graph

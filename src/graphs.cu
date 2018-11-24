@@ -11,7 +11,9 @@ void stage1(bool * status, int * d_q_curlen, int * d_q_nexlen, int * d_S_len, in
     {
         if(atomicCAS(&d_dist[i],INT_MAX,d_dist[id]+1)==INT_MAX)
         {
+            printf("%d netlen\n",*d_q_nexlen);
             int temp = atomicAdd(d_q_nexlen,1);
+            printf("%d netlen\n",*d_q_nexlen);
             d_q_next[temp]=i;
         }
         if(d_dist[i]==(d_dist[id]+1))
@@ -41,6 +43,22 @@ void stage1(bool * status, int * d_q_curlen, int * d_q_nexlen, int * d_S_len, in
         *d_q_nexlen=0;
 
         __syncthreads();
+    }
+
+    if(id==4)
+    {
+        for(int x = 0;x<5;x++)
+            printf("%d ",d_sigma[x]);
+        printf("\n");
+        for(int x = 0;x<5;x++)
+            printf("%d ",d_ends[x]);
+        printf("\n");
+        for(int x = 0;x<5;x++)
+            printf("%d ",d_S[x]);
+        printf("\n");
+        for(int x = 0;x<5;x++)
+            printf("%d ",d_dist[x]);
+        printf("\n");
     }
 }
 
@@ -101,7 +119,7 @@ namespace graphs{
             cudaMemcpy(d_status, &h_status, sizeof(bool), cudaMemcpyHostToDevice);
             stage1<<<10,10>>>(d_status,d_q_curlen,d_q_nexlen,d_S_len,d_ends_len,d_q_cur,d_q_next,d_sigma,d_delta,d_S,d_ends,d_dist,d_depth,d_edges);
             cudaMemcpy(&h_status, d_status, sizeof(bool), cudaMemcpyDeviceToHost);
-
+            printf("rwlb\n, %d \n",h_status);
             if(h_status == false)
                 break;
         }
